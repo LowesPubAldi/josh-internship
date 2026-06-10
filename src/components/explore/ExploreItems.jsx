@@ -77,10 +77,7 @@ const ExploreItems = () => {
           </div>
         ))
       ) : (
-        items
-        .filter((item) => item.expiryDate > currentTime)
-        .slice(0, visibleItems)
-        .map((item, index) => (
+        items.slice(0, visibleItems).map((item, index) => (
           <div
             key={index}
             className="d-item col-lg-3 col-md-6 col-sm-6 col-xs-12"
@@ -97,10 +94,11 @@ const ExploreItems = () => {
                   <i className="fa fa-check"></i>
                 </Link>
               </div>
-
-              <div className="de_countdown">
-                {formatTimeLeft(item.expiryDate)}
+                {item.expiryDate > currentTime && (
+               <div className="de_countdown">
+               {formatTimeLeft(item.expiryDate)}
               </div>
+                  )}
 
               <div className="nft__item_wrap">
                 <div className="nft__item_extra">
