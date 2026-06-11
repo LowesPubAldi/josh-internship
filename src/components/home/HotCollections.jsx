@@ -20,6 +20,8 @@ async function getHotCollections() {
       "https://us-central1-nft-cloud-functions.cloudfunctions.net/hotCollections"
     );
 
+    console.log(data[0]);
+
     setTimeout(() => {
       setCollections(data);
       setLoading(false);
@@ -57,7 +59,7 @@ useEffect(() => {
           ) : (
           <OwlCarousel
           className="owl-carousel owl-theme"
-          loop={false}
+          loop
           margin={20}
           nav
           dots={false}
@@ -68,7 +70,7 @@ useEffect(() => {
           }}
           >
           {collections.map((collection) => (
-            <div className="item" key={collection.id}>
+            <div className="item" key={collection.nftId}>
               <div className="nft_coll">
                 <div className="nft_wrap">
                   <Link to={`/item-details/${collection.nftId}`}>
