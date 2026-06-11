@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from "react";
 import AuthorBanner from "../images/author_banner.jpg";
 import AuthorItems from "../components/author/AuthorItems";
+import { useParams } from "react-router-dom";
 
 const Author = () => {
   const [author, setAuthor] = useState({});
   const [loading, setLoading] = useState(true);
   const [following, setFollowing] = useState(false);
+  const { id } = useParams();
 
   async function fetchAuthor() {
     setLoading(true);
 
     const response = await fetch(
-      "https://us-central1-nft-cloud-functions.cloudfunctions.net/authors?author=73855012"
+      `https://us-central1-nft-cloud-functions.cloudfunctions.net/authors?author=${id}`
     );
 
     const data = await response.json();
@@ -24,7 +26,7 @@ const Author = () => {
 
   useEffect(() => {
     fetchAuthor();
-  }, []);
+  }, [id]);
 
   return (
     <div id="wrapper">
@@ -87,7 +89,7 @@ const Author = () => {
 
                 <div className="col-md-12">
                   <div className="de_tab tab_simple">
-                    <AuthorItems />
+                    <AuthorItems authorId={id} />
                   </div>
                 </div>
               </div>

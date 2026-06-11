@@ -8,10 +8,9 @@ const TopSellers = () => {
 
 async function getTopSellers() {
   const { data } = await axios.get(
-    "https://us-central1-nft-cloud-functions.cloudfunctions.net/topSellers"
+    `https://us-central1-nft-cloud-functions.cloudfunctions.net/topSellers`
   );
 
-console.log(data);
 setSellers(data);
 }
 
@@ -41,7 +40,7 @@ useEffect (() => {
                 sellers.map((seller) => (
                   <li key={seller.id}>
                     <div className="author_list_pp">
-                      <Link to="/author">
+                      <Link to={`/author/${seller.authorId}`}>
                         <img
                           className="lazy pp-author"
                           src={seller.authorImage}
@@ -51,7 +50,7 @@ useEffect (() => {
                       </Link>
                     </div>
                     <div className="author_list_info">
-                      <Link to="/author">{seller.authorName}</Link>
+                     <Link to={`/author/${seller.authorId}`}>{seller.authorName}</Link>
                       <span>{seller.price} ETH</span>
                     </div>
                   </li>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-const AuthorItems = () => {
+const AuthorItems = ({ authorId } ) => {
   const [author, setAuthor] = useState({});
   const [loading, setLoading] = useState(true);
 
@@ -9,7 +9,7 @@ const AuthorItems = () => {
     setLoading(true);
 
     const response = await fetch(
-      "https://us-central1-nft-cloud-functions.cloudfunctions.net/authors?author=73855012"
+      `https://us-central1-nft-cloud-functions.cloudfunctions.net/authors?author=${authorId}`
     );
 
     const data = await response.json();
