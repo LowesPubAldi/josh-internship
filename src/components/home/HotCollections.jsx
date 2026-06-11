@@ -13,17 +13,25 @@ const HotCollections = () => {
   const [loading, setLoading] = useState(true);
 
 async function getHotCollections() {
-  setLoading(true);
+  try {
+    setLoading(true);
 
-  const { data } = await axios.get(
-    "https://us-central1-nft-cloud-functions.cloudfunctions.net/hotCollections"
-  );
+    const { data } = await axios.get(
+      "https://us-central1-nft-cloud-functions.cloudfunctions.net/hotCollections"
+    );
 
-  setTimeout(() => {
-    setCollections(data);
+    setTimeout(() => {
+      setCollections(data);
+      setLoading(false);
+    }, 1000);
+  } catch (error) {
+    console.log("Hot Collections Error:", error);
     setLoading(false);
-  }, 1000);
+  }
 }
+useEffect(() => {
+  getHotCollections();
+}, []);
 
   return (
     <section id="section-collections" className="no-bottom">
@@ -49,7 +57,7 @@ async function getHotCollections() {
           ) : (
           <OwlCarousel
           className="owl-carousel owl-theme"
-          loop
+          loop={false}
           margin={20}
           nav
           dots={false}
