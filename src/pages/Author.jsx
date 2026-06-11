@@ -44,7 +44,7 @@ const Author = () => {
           <div className="container">
             {loading ? (
               <div className="row">
-                <div className="col-md-12">Loading...</div>
+                <Skeleton width="100%" height="200px" borderRadius="12px" />
               </div>
             ) : (
               <div className="row">

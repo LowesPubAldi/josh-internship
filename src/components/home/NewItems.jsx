@@ -8,14 +8,18 @@ import Skeleton from "../UI/Skeleton";
 
 const NewItems = () => {
   const[items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  async function getNewItems () {
-    const { data } = await axios.get(
-      "https://us-central1-nft-cloud-functions.cloudfunctions.net/newItems"
-    );
+async function getNewItems() {
+  setLoading(true);
 
-    setTimeout (() => {
+  const { data } = await axios.get(
+    "https://us-central1-nft-cloud-functions.cloudfunctions.net/newItems"
+  );
+
+  setTimeout(() => {
     setItems(data);
+    setLoading(false);
   }, 2000);
 }
 
@@ -48,7 +52,7 @@ function timeRemaining(expiryDate) {
               <div className="small-border bg-color-2"></div>
             </div>
           </div>
-{items.length === 0 ? (
+{loading ? (
   <div className="row">
     {new Array(4).fill(0).map((_, index) => (
       <div className="col-lg-3 col-md-6 col-sm-6 col-xs-12" key={index}>
@@ -74,13 +78,14 @@ function timeRemaining(expiryDate) {
             <div className="item" key={item.id}>
               <div className="nft__item">
                 <div className="author_list_pp">
-                  <Link
-                    to="/author"
+                
+                  <Link to={`/author/${item.authorId}`}
+                    src={item.authorImage}
                     data-bs-toggle="tooltip"
                     data-bs-placement="top"
                     title="Creator: Monica Lucas"
                   >
-                    <img className="lazy" src={item.AuthorImage} alt="" />
+                    <img className="lazy" src={item.authorImage} alt="" />
                     <i className="fa fa-check"></i>
                   </Link>
                 </div>

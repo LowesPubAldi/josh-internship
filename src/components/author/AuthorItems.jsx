@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import Skeleton from "../UI/Skeleton";
 
 const AuthorItems = ({ authorId } ) => {
   const [author, setAuthor] = useState({});
@@ -28,16 +29,16 @@ const AuthorItems = ({ authorId } ) => {
     <div className="de_tab_content">
       <div className="tab-1">
         <div className="row">
-          {loading ? (
-            new Array(4).fill(0).map((_, index) => (
-              <div
-                className="col-lg-3 col-md-6 col-sm-6 col-xs-12"
-                key={index}
-              >
-                <div className="nft__item">Loading...</div>
-              </div>
-            ))
-          ) : (
+        {loading ? (
+  new Array(4).fill(0).map((_, index) => (
+    <div
+      className="col-lg-3 col-md-6 col-sm-6 col-xs-12"
+      key={index}
+    >
+      <Skeleton width="100%" height="350px" borderRadius="12px" />
+    </div>
+  ))
+) : (
             author.nftCollection?.map((item, index) => (
               <div
                 className="col-lg-3 col-md-6 col-sm-6 col-xs-12"

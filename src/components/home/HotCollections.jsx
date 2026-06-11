@@ -10,17 +10,20 @@ import Skeleton from "../UI/Skeleton";
 
 const HotCollections = () => {
   const [collections, setCollections] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   async function getHotCollections() {
-    const { data } = await axios.get(
-      "https://us-central1-nft-cloud-functions.cloudfunctions.net/hotCollections"
-    );
-     setCollections(data);
-  }
+  setLoading(true);
 
-  useEffect (() => {
-    getHotCollections();
-  },[]);
+  const { data } = await axios.get(
+    "https://us-central1-nft-cloud-functions.cloudfunctions.net/hotCollections"
+  );
+
+  setTimeout(() => {
+    setCollections(data);
+    setLoading(false);
+  }, 1000);
+}
 
   return (
     <section id="section-collections" className="no-bottom">
@@ -32,19 +35,18 @@ const HotCollections = () => {
               <div className="small-border bg-color-2"></div>
             </div>
           </div>
-     {collections.length === 0 ? (     
-      <div className="row">
-       {new Array(4).fill(0).map((_, index) => (
-          <div className="col-lg-3 col-md-6 col-sm-6 col-xs-12"
-          key={index}>
-            <Skeleton
-            width="100%"
-            height="350px"
-            borderRadius="12px"/>
-            </div>
-       ))}
-       </div>
-       ) : (
+  {loading ? (
+  <div className="row">
+    {new Array(4).fill(0).map((_, index) => (
+      <div
+        className="col-lg-3 col-md-6 col-sm-6 col-xs-12"
+        key={index}
+      >
+        <Skeleton width="100%" height="350px" borderRadius="12px" />
+      </div>
+    ))}
+  </div>
+) : (
           <OwlCarousel
           className="owl-carousel owl-theme"
           loop
@@ -66,9 +68,8 @@ const HotCollections = () => {
                   </Link>
                 </div>
                 <div className="nft_coll_pp">
-                  <Link to="/author">
-                    <img className="lazy pp-coll" src={collection.authorImage} alt="" />
-                  </Link>
+                  <Link to={`/author/${collection.authorId}`}
+                    src={collection.authorImage} />
                   <i className="fa fa-check"></i>
                 </div>
                 <div className="nft_coll_info">

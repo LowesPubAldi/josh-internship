@@ -5,13 +5,19 @@ import Skeleton from "../UI/Skeleton";
 
 const TopSellers = () => {
   const [sellers, setSellers] = useState ([]);
+  const [loading, setLoading] = useState(true);
 
 async function getTopSellers() {
+  setLoading(true);
+
   const { data } = await axios.get(
-    `https://us-central1-nft-cloud-functions.cloudfunctions.net/topSellers`
+    "https://us-central1-nft-cloud-functions.cloudfunctions.net/topSellers"
   );
 
-setSellers(data);
+  setTimeout(() => {
+    setSellers(data);
+    setLoading(false);
+  }, 1000);
 }
 
 useEffect (() => {
@@ -30,7 +36,7 @@ useEffect (() => {
           </div>
           <div className="col-md-12">
             <ol className="author_list">
-              {sellers.length === 0 ? (
+              {loading ? (
                 new Array(12).fill(0).map((_, index) => (
                   <li key={index}>
                     <Skeleton width="100%" height="60px" borderRadius="10px" />

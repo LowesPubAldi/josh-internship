@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import EthImage from "../images/ethereum.svg";
 import { Link, useParams } from "react-router-dom";
+import Skeleton from "../UI/Skeleton";
 
 const ItemDetails = () => {
   const [item, setItem] = useState({});
@@ -29,12 +30,20 @@ useEffect(() => {
     <div id="wrapper">
       <div className="no-bottom no-top" id="content">
         <div id="top"></div>
-
         <section aria-label="section" className="mt90 sm-mt-0">
           <div className="container">
             {loading ? (
-              <div>Loading...</div>
-            ) : (
+  <div className="row">
+    <div className="col-md-6">
+      <Skeleton width="100%" height="500px" borderRadius="12px" />
+    </div>
+    <div className="col-md-6">
+      <Skeleton width="80%" height="40px" borderRadius="8px" />
+      <Skeleton width="40%" height="30px" borderRadius="8px" />
+      <Skeleton width="100%" height="100px" borderRadius="8px" />
+    </div>
+  </div>
+) : (
               <div className="row">
                 <div className="col-md-6 text-center">
                   <img
@@ -83,7 +92,6 @@ useEffect(() => {
                     </div>
 
                     <div className="spacer-40"></div>
-
                     <h6>Price</h6>
                     <div className="nft-item-price">
                       <img src={EthImage} alt="" />

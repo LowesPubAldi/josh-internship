@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import Skeleton from "../UI/Skeleton";
 
 const ExploreItems = () => {
   const [items, setItems] = useState([]);
@@ -67,16 +68,16 @@ const ExploreItems = () => {
         </select>
       </div>
 
-      {loading ? (
-        new Array(8).fill(0).map((_, index) => (
-          <div
-            key={index}
-            className="d-item col-lg-3 col-md-6 col-sm-6 col-xs-12"
-          >
-            <div className="nft__item">Loading...</div>
-          </div>
-        ))
-      ) : (
+{loading ? (
+  new Array(8).fill(0).map((_, index) => (
+    <div
+      key={index}
+      className="d-item col-lg-3 col-md-6 col-sm-6 col-xs-12"
+    >
+      <Skeleton width="100%" height="350px" borderRadius="12px" />
+    </div>
+  ))
+) : (
         items.slice(0, visibleItems).map((item, index) => (
           <div
             key={index}
