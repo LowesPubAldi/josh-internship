@@ -84,10 +84,11 @@ function timeRemaining(expiryDate) {
                     <i className="fa fa-check"></i>
                   </Link>
                 </div>
+                {timeRemaining(item.expiryDate) !== "0h 0m 0s" && (
                 <div className="de_countdown">
                   {timeRemaining(item.expiryDate)}
                   </div>
-
+                )}
                 <div className="nft__item_wrap">
                   <div className="nft__item_extra">
                     <div className="nft__item_buttons">
