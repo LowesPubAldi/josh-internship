@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import AuthorBanner from "../images/author_banner.jpg";
 import AuthorItems from "../components/author/AuthorItems";
-import { Link } from "react-router-dom";
 
 const Author = () => {
   const [author, setAuthor] = useState({});
@@ -80,7 +79,7 @@ const Author = () => {
                         onClick={() => setFollowing(!following)}
                         >
                         {following ? "Unfollow" : "Follow"}
-</button>
+                      </button>
                       </div>
                     </div>
                   </div>
