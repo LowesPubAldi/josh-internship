@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import EthImage from "../images/ethereum.svg";
 import { Link, useParams } from "react-router-dom";
-import Skeleton from "../UI/Skeleton";
+import Skeleton from "../components/UI/Skeleton";
 
 const ItemDetails = () => {
   const [item, setItem] = useState({});

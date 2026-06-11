@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import AuthorBanner from "../images/author_banner.jpg";
 import AuthorItems from "../components/author/AuthorItems";
 import { useParams } from "react-router-dom";
+import Skeleton from "../components/UI/Skeleton";
 
 const Author = () => {
   const [author, setAuthor] = useState({});
