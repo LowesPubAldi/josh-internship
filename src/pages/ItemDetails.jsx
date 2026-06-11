@@ -7,11 +7,10 @@ const ItemDetails = () => {
   const [loading, setLoading] = useState(true);
   const { nftId } = useParams();
 
+useEffect(() => {
   async function fetchItemDetails() {
-    setLoading(true);
-
     const response = await fetch(
-      `https://us-central1-nft-cloud-functions.cloudfunctions.net/itemDetails?nftId=${nftId || 17914494}`
+      `https://us-central1-nft-cloud-functions.cloudfunctions.net/itemDetails?nftId=${nftId}`
     );
 
     const data = await response.json();
@@ -21,11 +20,10 @@ const ItemDetails = () => {
       setLoading(false);
     }, 1000);
   }
-// eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    fetchItemDetails();
-  }, [nftId]);
+
+  window.scrollTo(0, 0);
+  fetchItemDetails();
+}, [nftId]);
 
   return (
     <div id="wrapper">
