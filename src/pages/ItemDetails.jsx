@@ -21,7 +21,7 @@ const ItemDetails = () => {
       setLoading(false);
     }, 1000);
   }
-//eslint-disable-next-line react-hooks/exhaustive
+// eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     window.scrollTo(0, 0);
     fetchItemDetails();
