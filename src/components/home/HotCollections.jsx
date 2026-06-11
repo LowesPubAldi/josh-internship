@@ -12,7 +12,7 @@ const HotCollections = () => {
   const [collections, setCollections] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  async function getHotCollections() {
+async function getHotCollections() {
   setLoading(true);
 
   const { data } = await axios.get(
@@ -35,18 +35,18 @@ const HotCollections = () => {
               <div className="small-border bg-color-2"></div>
             </div>
           </div>
-  {loading ? (
-  <div className="row">
-    {new Array(4).fill(0).map((_, index) => (
-      <div
-        className="col-lg-3 col-md-6 col-sm-6 col-xs-12"
-        key={index}
-      >
+          {loading ? (
+          <div className="row">
+          {new Array(4).fill(0).map((_, index) => (
+          <div
+            className="col-lg-3 col-md-6 col-sm-6 col-xs-12"
+            key={index}
+        >
         <Skeleton width="100%" height="350px" borderRadius="12px" />
-      </div>
-    ))}
-  </div>
-) : (
+          </div>
+          ))}
+          </div>
+          ) : (
           <OwlCarousel
           className="owl-carousel owl-theme"
           loop

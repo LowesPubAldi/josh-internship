@@ -24,7 +24,7 @@ const ExploreItems = () => {
       setItems(data);
       setVisibleItems(8);
       setLoading(false);
-    }, 1000);
+    }, 1500);
   }
 
   useEffect(() => {
