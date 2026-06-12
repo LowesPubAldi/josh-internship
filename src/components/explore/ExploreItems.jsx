@@ -24,7 +24,7 @@ const ExploreItems = () => {
       setItems(data);
       setVisibleItems(8);
       setLoading(false);
-    }, 2000);
+    }, 1000);
   }
 
   useEffect(() => {
@@ -59,8 +59,7 @@ const ExploreItems = () => {
         <select
           id="filter-items"
           defaultValue=""
-          onChange={(event) => setFilter(event.target.value)}
-        >
+          onChange={(event) => setFilter(event.target.value)}>
           <option value="">Default</option>
           <option value="price_low_to_high">Price, Low to High</option>
           <option value="price_high_to_low">Price, High to Low</option>
@@ -68,9 +67,10 @@ const ExploreItems = () => {
         </select>
       </div>
 
-{loading ? (
-  new Array(8).fill(0).map((_, index) => (
-    <div
+      <div className="row">
+      {loading ? (
+        new Array(8).fill(0).map((_, index) => (
+      <div
       key={index}
       className="d-item col-lg-3 col-md-6 col-sm-6 col-xs-12"
     >
@@ -143,6 +143,7 @@ const ExploreItems = () => {
           </div>
         ))
       )}
+      </div>
 
       {!loading && visibleItems < items.length && (
         <div className="col-md-12 text-center">
