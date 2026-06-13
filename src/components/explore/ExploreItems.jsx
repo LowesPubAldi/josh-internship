@@ -70,14 +70,22 @@ const ExploreItems = () => {
       <div className="row">
       {loading ? (
         new Array(8).fill(0).map((_, index) => (
+      <div className="col-12">
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "24px" }}>
+        {new Array(8).fill(0).map((_, index) => (
       <div
-      key={index}
-      className="d-item col-lg-3 col-md-6 col-sm-6 col-xs-12"
-    >
-      <Skeleton width="100%" height="350px" borderRadius="12px" />
-    </div>
-  ))
-) : (
+        key={index}
+        style={{
+          height: "350px",
+          backgroundColor: "#dddddd",
+          borderRadius: "12px",
+        }}
+        ></div>
+        ))}
+      </div>
+      </div>
+        ))
+        ) : (
         items.slice(0, visibleItems).map((item, index) => (
           <div
             key={index}
