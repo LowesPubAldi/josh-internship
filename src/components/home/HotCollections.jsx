@@ -78,8 +78,13 @@ useEffect(() => {
                   </Link>
                 </div>
                 <div className="nft_coll_pp">
-                  <Link to={`/author/${collection.authorId}`}
-                    src={collection.authorImage} />
+                  <Link to={`/author/${collection.authorId}`}>
+                  <img
+                  className="lazy"
+                  src={collection.authorImage} 
+                  alt=""  
+                    />
+                    </Link>
                   <i className="fa fa-check"></i>
                 </div>
                 <div className="nft_coll_info">
