@@ -1,30 +1,40 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Skeleton from "../UI/Skeleton";
+import ErrorNotice from "../UI/ErrorNotice";
 
 const ExploreItems = () => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [visibleItems, setVisibleItems] = useState(8);
   const [filter, setFilter] = useState("");
   const [currentTime, setCurrentTime] = useState(Date.now());
 
   async function fetchExploreItems(filterValue = "") {
     setLoading(true);
+    setError("");
 
-    const response = await fetch(
-      `https://us-central1-nft-cloud-functions.cloudfunctions.net/explore${
-        filterValue ? `?filter=${filterValue}` : ""
-      }`
-    );
+    try {
+      const response = await fetch(
+        `https://us-central1-nft-cloud-functions.cloudfunctions.net/explore${
+          filterValue ? `?filter=${filterValue}` : ""
+        }`
+      );
 
-    const data = await response.json();
+      if (!response.ok) {
+        throw new Error("Failed to load explore items.");
+      }
 
-    setTimeout(() => {
-      setItems(data);
+      const data = await response.json();
+      setItems(Array.isArray(data) ? data : []);
       setVisibleItems(8);
+    } catch (fetchError) {
+      setItems([]);
+      setError("We could not load explore items right now.");
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   }
 
   useEffect(() => {
@@ -53,12 +63,16 @@ const ExploreItems = () => {
     return `${hours}h ${minutes}m ${seconds}s`;
   }
 
+  function getItemUrl(nftId) {
+    return `${window.location.origin}/item-details/${nftId}`;
+  }
+
   return (
     <>
       <div>
         <select
           id="filter-items"
-          defaultValue=""
+          value={filter}
           onChange={(event) => setFilter(event.target.value)}>
           <option value="">Default</option>
           <option value="price_low_to_high">Price, Low to High</option>
@@ -68,27 +82,16 @@ const ExploreItems = () => {
       </div>
 
       <div className="row">
-      {loading ? (
-        new Array(8).fill(0).map((_, index) => (
-      <div className="col-12">
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "24px" }}>
-        {new Array(8).fill(0).map((_, index) => (
-      <div
-        key={index}
-        style={{
-          height: "350px",
-          backgroundColor: "#dddddd",
-          borderRadius: "12px",
-        }}
-        ></div>
-        ))}
-      </div>
-      </div>
-        ))
+        {loading ? (
+          new Array(8).fill(0).map((_, index) => (
+            <div key={index} className="d-item col-lg-3 col-md-6 col-sm-6 col-xs-12">
+              <Skeleton width="100%" height="350px" borderRadius="12px" />
+            </div>
+          ))
         ) : (
-        items.slice(0, visibleItems).map((item, index) => (
+          items.slice(0, visibleItems).map((item) => (
           <div
-            key={index}
+            key={item.nftId}
             className="d-item col-lg-3 col-md-6 col-sm-6 col-xs-12"
             style={{ display: "block", backgroundSize: "cover" }}
           >
@@ -103,11 +106,9 @@ const ExploreItems = () => {
                   <i className="fa fa-check"></i>
                 </Link>
               </div>
-                {item.expiryDate > currentTime && (
-               <div className="de_countdown">
-               {formatTimeLeft(item.expiryDate)}
-        </div>
-)}
+              {item.expiryDate > currentTime && (
+                <div className="de_countdown">{formatTimeLeft(item.expiryDate)}</div>
+              )}
 
               <div className="nft__item_wrap">
                 <div className="nft__item_extra">
@@ -116,13 +117,29 @@ const ExploreItems = () => {
                   </div>
                   <div className="nft__item_share">
                     <h4>Share</h4>
-                    <a href="" target="_blank" rel="noreferrer">
+                    <a
+                      href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+                        getItemUrl(item.nftId)
+                      )}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
                       <i className="fa fa-facebook fa-lg"></i>
                     </a>
-                    <a href="" target="_blank" rel="noreferrer">
+                    <a
+                      href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(
+                        getItemUrl(item.nftId)
+                      )}&text=${encodeURIComponent(item.title)}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
                       <i className="fa fa-twitter fa-lg"></i>
                     </a>
-                    <a href="">
+                    <a
+                      href={`mailto:?subject=${encodeURIComponent(
+                        `Check out ${item.title}`
+                      )}&body=${encodeURIComponent(getItemUrl(item.nftId))}`}
+                    >
                       <i className="fa fa-envelope fa-lg"></i>
                     </a>
                   </div>
@@ -149,20 +166,28 @@ const ExploreItems = () => {
               </div>
             </div>
           </div>
-        ))
-      )}
+          ))
+        )}
       </div>
+
+      {!loading && <ErrorNotice message={error} />}
+
+      {!loading && !error && items.length === 0 && (
+        <div className="col-md-12 text-center">
+          <p>No items found for this filter.</p>
+        </div>
+      )}
 
       {!loading && visibleItems < items.length && (
         <div className="col-md-12 text-center">
-          <Link
-            to=""
+          <button
+            type="button"
             id="loadmore"
             className="btn-main lead"
             onClick={() => setVisibleItems(visibleItems + 4)}
           >
             Load more
-          </Link>
+          </button>
         </div>
       )}
     </>

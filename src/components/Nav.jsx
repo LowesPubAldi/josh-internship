@@ -5,7 +5,7 @@ import { FaTimes } from "react-icons/fa";
 
 const Nav = () => {
   const openNav = () => {
-    document.body.classList += "menu__open";
+    document.body.classList.add("menu__open");
   };
 
   const closeNav = () => {
@@ -49,15 +49,14 @@ const Nav = () => {
                     </Link>
                   </li>
                   <li>
-                    <Link
-                      to="#"
+                    <button
+                      type="button"
                       className="btn-main connect-wallet"
-                      onClick={() =>
-                        alert("This feature has not been implemented yet")
-                      }
+                      disabled
+                      title="Wallet integration coming soon"
                     >
-                      Connect wallet
-                    </Link>
+                      Connect wallet (soon)
+                    </button>
                   </li>
                 </ul>
 
