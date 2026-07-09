@@ -10,11 +10,25 @@ A React-based NFT marketplace frontend that displays featured collections, new l
 
 - Local URL: http://localhost:3000
 - Live deploy: https://lowespubaldi.github.io/josh-internship/
+- Vercel deploy: https://josh-internship.vercel.app/
 - Primary routes: /, /explore, /author/:id, /item-details/:nftId
 
 ## Screenshots
 
+### Home Hero
+
+![Ultraverse logo and home hero](src/images/Ultraverse.png)
+
+### Marketplace Card View
+
 ![NFT card preview](src/images/nft.png)
+
+### Item Art Preview
+
+![NFT artwork preview](src/images/nftImage.jpg)
+
+### Creator Profile Banner
+
 ![Author profile banner](src/images/author_banner.jpg)
 
 ## Highlights
