@@ -1,125 +1,70 @@
-# Ultraverse NFT Marketplace
+# Getting Started with Create React App
 
-A React-based NFT marketplace frontend that displays featured collections, new listings, top sellers, creator profiles, and item detail pages.
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-![React](https://img.shields.io/badge/React-17-61DAFB?logo=react&logoColor=white)
-![Router](https://img.shields.io/badge/Router-v6-CA4245)
-![Build](https://img.shields.io/badge/build-passing-brightgreen)
+## Available Scripts
 
-## Demo
+In the project directory, you can run:
 
-- Local URL: http://localhost:3000
-- Live deploy: https://lowespubaldi.github.io/josh-internship/
-- Vercel deploy: https://josh-internship.vercel.app/
-- Primary routes: /, /explore, /author/:id, /item-details/:nftId
+### `npm start`
 
-## Screenshots
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-### Home Hero
+The page will reload when you make changes.\
+You may also see any lint errors in the console.
 
-![Ultraverse logo and home hero](src/images/Ultraverse.png)
+### `npm test`
 
-### Marketplace Card View
+Launches the test runner in the interactive watch mode.\
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-![NFT card preview](src/images/nft.png)
+### `npm run build`
 
-### Item Art Preview
+Builds the app for production to the `build` folder.\
+It correctly bundles React in production mode and optimizes the build for the best performance.
 
-![NFT artwork preview](src/images/nftImage.jpg)
+The build is minified and the filenames include the hashes.\
+Your app is ready to be deployed!
 
-### Creator Profile Banner
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-![Author profile banner](src/images/author_banner.jpg)
+### `npm run eject`
 
-## Highlights
+**Note: this is a one-way operation. Once you `eject`, you can't go back!**
 
-- Multi-page navigation with React Router
-- Dynamic NFT data pulled from hosted cloud function endpoints
-- Loading skeletons for better perceived performance
-- Countdown timers for expiring listings
-- Responsive layouts for desktop and mobile
+If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-## Tech Stack
+Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
 
-- React 17
-- React Router 6
-- Axios + Fetch API
-- AOS animations
-- Owl Carousel
-- Bootstrap utility/layout classes
+You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
 
-## Run Locally
+## Learn More
 
-1. Install dependencies:
+You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-```bash
-npm install
-```
+To learn React, check out the [React documentation](https://reactjs.org/).
 
-2. Start development server:
+### Code Splitting
 
-```bash
-npm start
-```
+This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
 
-3. Open http://localhost:3000 in your browser.
+### Analyzing the Bundle Size
 
-## Production Build
+This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
 
-```bash
-npm run build
-```
+### Making a Progressive Web App
 
-The production bundle is generated in the build folder.
+This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
 
-## Quality Gates
+### Advanced Configuration
 
-- Unit smoke tests: npm run test:ci
-- Production build check: npm run build
-- GitHub Actions CI on push and pull requests to main
+This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
 
-## Release Checklist
+### Deployment
 
-1. Pull latest main and install dependencies with npm ci.
-2. Run quality gates locally: npm run test:ci and npm run build.
-3. Push branch and confirm GitHub Actions CI is green.
-4. Deploy latest build to production target.
-5. Smoke-test live routes:
-	- /
-	- /explore
-	- /item-details (redirect behavior)
-	- /item-details/<valid-nft-id>
-	- /author/<valid-author-id>
-6. Verify API-backed sections render and graceful error notices appear if endpoints fail.
-7. Tag release in git (example: v1.0.0) and publish release notes summarizing user-facing changes.
+This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
 
-## Project Story
+### `npm run build` fails to minify
 
-This project started as a template-based NFT UI and was iterated into a portfolio-ready frontend with stronger reliability and clearer UX.
-
-### What Was Improved
-
-- Removed placeholder and dead-link behavior that made the app feel unfinished
-- Added resilient fetch error handling with consistent user-facing error notices
-- Added route-safe behavior for invalid item detail paths
-- Added smoke tests for critical navigation and redirect behavior
-- Added CI automation to enforce test/build checks on every PR and push
-
-### Tradeoffs
-
-- Wallet connection is intentionally UI-only in this version (no web3 provider integration yet)
-- Data relies on public demo APIs, which can be rate-limited or intermittently unavailable
-
-## Project Structure
-
-- src/pages: Route-level pages
-- src/components: Shared and section components
-- src/components/home: Home page blocks
-- src/components/explore: Explore listing UI
-- src/components/author: Author profile listing UI
-- public: HTML shell and static metadata
-
-## Notes
-
-- This project currently uses public demo APIs for NFT/author data.
-- Wallet connect and transaction flow are UI-only and not yet integrated with a real web3 provider.
+This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)

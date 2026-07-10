@@ -1,31 +1,33 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import AuthorImage from "../../images/author_thumbnail.jpg";
+import nftImage from "../../images/nftImage.jpg";
 import axios from "axios";
 import OwlCarousel from "react-owl-carousel";
 import "../../css/styles/owl.carousel.css"
 import "../../css/styles/owl.theme.css"
 import Skeleton from "../UI/Skeleton";
-import ErrorNotice from "../UI/ErrorNotice";
 
 const HotCollections = () => {
   const [collections, setCollections] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
 
 async function getHotCollections() {
   try {
     setLoading(true);
-    setError("");
 
     const { data } = await axios.get(
       "https://us-central1-nft-cloud-functions.cloudfunctions.net/hotCollections"
     );
 
-    setCollections(Array.isArray(data) ? data : []);
+    console.log(data[0]);
+
+    setTimeout(() => {
+      setCollections(data);
+      setLoading(false);
+    }, 1000);
   } catch (error) {
-    setCollections([]);
-    setError("We could not load hot collections right now.");
-  } finally {
+    console.log("Hot Collections Error:", error);
     setLoading(false);
   }
 }
@@ -43,7 +45,6 @@ useEffect(() => {
               <div className="small-border bg-color-2"></div>
             </div>
           </div>
-          {!loading && <ErrorNotice message={error} />}
           {loading ? (
           <div className="row">
           {new Array(4).fill(0).map((_, index) => (
@@ -55,7 +56,7 @@ useEffect(() => {
           </div>
           ))}
           </div>
-          ) : !error ? (
+          ) : (
           <OwlCarousel
           className="owl-carousel owl-theme"
           loop
@@ -96,7 +97,7 @@ useEffect(() => {
             </div>
           ))}
           </OwlCarousel>
-          ) : null}
+          )}
         </div>
       </div>
     </section>

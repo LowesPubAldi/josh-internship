@@ -6,15 +6,13 @@ import Skeleton from "../components/UI/Skeleton";
 const Explore = () => {
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
+useEffect(() => {
+  window.scrollTo(0, 0);
 
-    const timeoutId = setTimeout(() => {
-      setLoading(false);
-    }, 1200);
-
-    return () => clearTimeout(timeoutId);
-  }, []);
+  setTimeout(() => {
+    setLoading(false);
+  }, 3000);
+}, []);
 
   return (
     <div id="wrapper">
@@ -38,25 +36,31 @@ const Explore = () => {
         <section aria-label="section">
           <div className="container">
             <div className="row">
-              {loading ? (
-                new Array(8).fill(0).map((_, index) => (
-                  <div
-                    key={index}
-                    className="d-item col-lg-3 col-md-6 col-sm-6 col-xs-12"
-                    style={{ marginBottom: "30px" }}
-                  >
-                    <Skeleton width="100%" height="350px" borderRadius="12px" />
-                  </div>
-                ))
-              ) : (
-                <ExploreItems />
+            {loading ? (
+              new Array(8).fill(0).map((_, index) => (
+            <div
+              key={index}
+              className="d-item col-lg-3 col-md-6 col-sm-6 col-xs-12"
+              style={{ marginBottom: "30px" }}
+            >
+            <div
+            style={{
+              width: "100%",
+              height: "350px",
+              backgroundColor: "red",
+              border: "5px solid black"
+            }}
+            >TEST
+            </div></div>
+            ))
+            ) : (
+            <ExploreItems />
               )}
             </div>
           </div>
         </section>
       </div>
     </div>
-  );
-};
+  )};
 
 export default Explore;

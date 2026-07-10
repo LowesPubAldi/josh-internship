@@ -3,70 +3,31 @@ import AuthorBanner from "../images/author_banner.jpg";
 import AuthorItems from "../components/author/AuthorItems";
 import { useParams } from "react-router-dom";
 import Skeleton from "../components/UI/Skeleton";
-import ErrorNotice from "../components/UI/ErrorNotice";
 
 const Author = () => {
   const [author, setAuthor] = useState({});
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [following, setFollowing] = useState(false);
-  const [copyMessage, setCopyMessage] = useState("");
   const { id } = useParams();
 
-  useEffect(() => {
-    let isMounted = true;
+  async function fetchAuthor() {
+    setLoading(true);
 
-    async function fetchAuthor() {
-      setLoading(true);
-      setError("");
+    const response = await fetch(
+      `https://us-central1-nft-cloud-functions.cloudfunctions.net/authors?author=${id}`
+    );
 
-      try {
-        const response = await fetch(
-          `https://us-central1-nft-cloud-functions.cloudfunctions.net/authors?author=${id}`
-        );
+    const data = await response.json();
 
-        if (!response.ok) {
-          throw new Error("Failed to load author.");
-        }
-
-        const data = await response.json();
-        if (isMounted) {
-          setAuthor(data || {});
-        }
-      } catch (fetchError) {
-        if (isMounted) {
-          setAuthor({});
-          setError("We could not load this author profile right now.");
-        }
-      } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
-      }
-    }
-
-    window.scrollTo(0, 0);
-    fetchAuthor();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [id]);
-
-  async function handleCopyAddress() {
-    if (!author.address) {
-      return;
-    }
-
-    try {
-      await navigator.clipboard.writeText(author.address);
-      setCopyMessage("Wallet copied");
-      setTimeout(() => setCopyMessage(""), 1500);
-    } catch (clipboardError) {
-      setCopyMessage("Copy failed");
-      setTimeout(() => setCopyMessage(""), 1500);
-    }
+    setTimeout(() => {
+      setAuthor(data);
+      setLoading(false);
+    }, 1000);
   }
+
+  useEffect(() => {
+    fetchAuthor();
+  }, [id]);
 
   return (
     <div id="wrapper">
@@ -82,13 +43,11 @@ const Author = () => {
 
         <section aria-label="section">
           <div className="container">
-            {!loading && <ErrorNotice message={error} />}
-
             {loading ? (
               <div className="row">
                 <Skeleton width="100%" height="200px" borderRadius="12px" />
               </div>
-            ) : !error ? (
+            ) : (
               <div className="row">
                 <div className="col-md-12">
                   <div className="d_profile de-flex">
@@ -105,10 +64,9 @@ const Author = () => {
                             <span id="wallet" className="profile_wallet">
                               {author.address}
                             </span>
-                            <button id="btn_copy" title="Copy Text" onClick={handleCopyAddress}>
+                            <button id="btn_copy" title="Copy Text">
                               Copy
                             </button>
-                            {copyMessage && <span className="profile_username">{copyMessage}</span>}
                           </h4>
                         </div>
                       </div>
@@ -117,16 +75,14 @@ const Author = () => {
                     <div className="profile_follow de-flex">
                       <div className="de-flex-col">
                         <div className="profile_follower">
-                          {following
-                            ? (Number(author.followers) || 0) + 1
-                            : Number(author.followers) || 0} followers
+                          {following ? author.followers + 1 : author.followers} followers
                         </div>
                         <button
-                          className="btn-main"
-                          onClick={() => setFollowing(!following)}
+                        className="btn-main"
+                        onClick={() => setFollowing(!following)}
                         >
-                          {following ? "Unfollow" : "Follow"}
-                        </button>
+                        {following ? "Unfollow" : "Follow"}
+                      </button>
                       </div>
                     </div>
                   </div>
@@ -138,7 +94,7 @@ const Author = () => {
                   </div>
                 </div>
               </div>
-            ) : null}
+            )}
           </div>
         </section>
       </div>
