@@ -6,8 +6,8 @@ const Footer = () => {
   return (
     <footer className="footer-light">
       <div className="container">
-        <div className="row">
-          <div className="col-md-3 col-sm-6 col-xs-1">
+        <div className="row footer-columns justify-content-center text-center">
+          <div className="col-lg-4 col-md-4 col-sm-6 col-xs-12 footer-column">
             <div className="widget">
               <h5>Marketplace</h5>
               <ul>
@@ -44,7 +44,7 @@ const Footer = () => {
               </ul>
             </div>
           </div>
-          <div className="col-md-3 col-sm-6 col-xs-1">
+          <div className="col-lg-4 col-md-4 col-sm-6 col-xs-12 footer-column">
             <div className="widget">
               <h5>Resources</h5>
               <ul>
@@ -73,15 +73,10 @@ const Footer = () => {
                     Docs
                   </span>
                 </li>
-                <li>
-                  <span className="no-cursor">
-                    Newsletter
-                  </span>
-                </li>
               </ul>
             </div>
           </div>
-          <div className="col-md-3 col-sm-6 col-xs-1">
+          <div className="col-lg-4 col-md-4 col-sm-6 col-xs-12 footer-column">
             <div className="widget">
               <h5>Community</h5>
               <ul>
@@ -116,36 +111,6 @@ const Footer = () => {
                   </span>
                 </li>
               </ul>
-            </div>
-          </div>
-          <div className="col-md-3 col-sm-6 col-xs-1">
-            <div className="widget">
-              <h5>Newsletter</h5>
-              <p>
-                Signup for our newsletter to get the latest news in your inbox.
-              </p>
-              <form
-                className="row form-dark"
-                id="form_subscribe"
-                name="form_subscribe"
-                onSubmit={(event) => event.preventDefault()}
-              >
-                <div className="col text-center">
-                  <input
-                    className="form-control"
-                    id="txt_subscribe"
-                    name="txt_subscribe"
-                    placeholder="enter your email"
-                    type="text"
-                  />
-                  <button type="submit" className="no-cursor" id="btn-subscribe" aria-label="Subscribe">
-                    <i className="arrow_right bg-color-secondary"></i>
-                  </button>
-                  <div className="clearfix"></div>
-                </div>
-              </form>
-              <div className="spacer-10"></div>
-              <small>Your email is safe with us. We don't spam.</small>
             </div>
           </div>
         </div>

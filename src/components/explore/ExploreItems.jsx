@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import Skeleton from "../UI/Skeleton";
 import ErrorNotice from "../UI/ErrorNotice";
 
@@ -10,6 +10,17 @@ const ExploreItems = () => {
   const [visibleItems, setVisibleItems] = useState(8);
   const [filter, setFilter] = useState("");
   const [currentTime, setCurrentTime] = useState(Date.now());
+  const [searchParams] = useSearchParams();
+  const rawSearchQuery = (searchParams.get("q") || "").trim();
+
+  function normalizeSearchText(value) {
+    return String(value || "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, " ")
+      .trim();
+  }
+
+  const normalizedSearchQuery = normalizeSearchText(rawSearchQuery);
 
   async function fetchExploreItems(filterValue = "") {
     setLoading(true);
@@ -49,6 +60,10 @@ const ExploreItems = () => {
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    setVisibleItems(8);
+  }, [normalizedSearchQuery]);
+
   function formatTimeLeft(expiryDate) {
     const timeLeft = expiryDate - currentTime;
 
@@ -67,6 +82,30 @@ const ExploreItems = () => {
     return `${window.location.origin}/item-details/${nftId}`;
   }
 
+  const filteredItems = normalizedSearchQuery
+    ? items.filter((item) => {
+        const searchableText = normalizeSearchText(
+          [
+            item.title,
+            item.name,
+            item.nftTitle,
+            item.authorName,
+            item.author,
+            item.ownerName,
+            item.collectionName,
+            item.tag,
+            item.authorId,
+          ]
+            .filter(Boolean)
+            .join(" ")
+        );
+
+        return searchableText.includes(normalizedSearchQuery);
+      })
+    : items;
+
+  const visibleFilteredItems = filteredItems.slice(0, visibleItems);
+
   return (
     <>
       <div>
@@ -79,6 +118,8 @@ const ExploreItems = () => {
           <option value="price_high_to_low">Price, High to Low</option>
           <option value="likes_high_to_low">Most liked</option>
         </select>
+
+        {rawSearchQuery && <p>Showing results for "{rawSearchQuery}"</p>}
       </div>
 
       <div className="row">
@@ -89,7 +130,7 @@ const ExploreItems = () => {
             </div>
           ))
         ) : (
-          items.slice(0, visibleItems).map((item) => (
+          visibleFilteredItems.map((item) => (
           <div
             key={item.nftId}
             className="d-item col-lg-3 col-md-6 col-sm-6 col-xs-12"
@@ -178,7 +219,13 @@ const ExploreItems = () => {
         </div>
       )}
 
-      {!loading && visibleItems < items.length && (
+      {!loading && !error && items.length > 0 && filteredItems.length === 0 && (
+        <div className="col-md-12 text-center">
+          <p>No NFTs matched your search.</p>
+        </div>
+      )}
+
+      {!loading && visibleItems < filteredItems.length && (
         <div className="col-md-12 text-center">
           <button
             type="button"

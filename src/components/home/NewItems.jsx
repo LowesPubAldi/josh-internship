@@ -1,17 +1,133 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import OwlCarousel from "react-owl-carousel";
-import "../../css/styles/owl.carousel.css"
-import "../../css/styles/owl.theme.css"
+import { useKeenSlider } from "keen-slider/react";
+import "keen-slider/keen-slider.min.css";
 import Skeleton from "../UI/Skeleton";
 import ErrorNotice from "../UI/ErrorNotice";
+
+const FEATURED_ZOOM_TITLES = new Set(["Deep Sea Phantasy", "Two Tigers"]);
+
+const AUTOPLAY_INTERVAL_MS = 3800;
+
+function autoplayPlugin(slider) {
+  let timeout;
+  let mouseOver = false;
+  let destroyed = false;
+
+  function clearNextTimeout() {
+    clearTimeout(timeout);
+  }
+
+  function nextTimeout() {
+    clearTimeout(timeout);
+
+    if (mouseOver || destroyed) {
+      return;
+    }
+
+    timeout = setTimeout(() => {
+      slider.next();
+    }, AUTOPLAY_INTERVAL_MS);
+  }
+
+  slider.on("created", () => {
+    slider.container.addEventListener("mouseover", () => {
+      mouseOver = true;
+      clearNextTimeout();
+    });
+
+    slider.container.addEventListener("mouseout", () => {
+      mouseOver = false;
+      nextTimeout();
+    });
+
+    nextTimeout();
+  });
+
+  slider.on("dragStarted", clearNextTimeout);
+  slider.on("animationEnded", nextTimeout);
+  slider.on("updated", nextTimeout);
+  slider.on("destroyed", () => {
+    destroyed = true;
+    clearNextTimeout();
+  });
+}
+
+function getTimeRemaining(expiryDate) {
+  const total = Number(expiryDate) - Date.now();
+
+  if (total <= 0) {
+    return { total: 0, label: "0h 0m 0s" };
+  }
+
+  const hours = Math.floor(total / (1000 * 60 * 60));
+  const minutes = Math.floor((total / (1000 * 60)) % 60);
+  const seconds = Math.floor((total / 1000) % 60);
+
+  return {
+    total,
+    label: `${hours}h ${minutes}m ${seconds}s`,
+  };
+}
+
+const CountdownTimer = ({ expiryDate }) => {
+  const [time, setTime] = useState(() => getTimeRemaining(expiryDate));
+
+  useEffect(() => {
+    setTime(getTimeRemaining(expiryDate));
+
+    const intervalId = setInterval(() => {
+      setTime(getTimeRemaining(expiryDate));
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [expiryDate]);
+
+  if (time.total <= 0) {
+    return null;
+  }
+
+  return <div className="de_countdown">{time.label}</div>;
+};
 
 const NewItems = () => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [currentTime, setCurrentTime] = useState(Date.now());
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [loaded, setLoaded] = useState(false);
+  const [sliderRef, instanceRef] = useKeenSlider({
+    loop: true,
+    mode: "snap",
+    defaultAnimation: {
+      duration: 850,
+    },
+    slideChanged(slider) {
+      setCurrentSlide(slider.track.details.rel);
+    },
+    created() {
+      setLoaded(true);
+    },
+    breakpoints: {
+      "(max-width: 999px)": {
+        slides: {
+          perView: 2,
+          spacing: 20,
+        },
+      },
+      "(max-width: 599px)": {
+        slides: {
+          perView: 1,
+          spacing: 20,
+        },
+      },
+    },
+    slides: {
+      perView: 4,
+      spacing: 20,
+    },
+  }, [autoplayPlugin]);
 
   async function getNewItems() {
     setLoading(true);
@@ -35,30 +151,40 @@ const NewItems = () => {
   }, []);
 
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      setCurrentTime(Date.now());
-    }, 1000);
-
-    return () => clearInterval(intervalId);
-  }, []);
-
-  function timeRemaining(expiryDate) {
-    const total = expiryDate - currentTime;
-
-    if (total <= 0) {
-      return "0h 0m 0s";
+    if (instanceRef.current) {
+      instanceRef.current.update();
     }
-
-    const hours = Math.floor(total / (1000 * 60 * 60));
-    const minutes = Math.floor((total / (1000 * 60)) % 60);
-    const seconds = Math.floor((total / 1000) % 60);
-
-    return `${hours}h ${minutes}m ${seconds}s`;
-  }
+  }, [items, instanceRef]);
 
   function getItemUrl(nftId) {
     return `${window.location.origin}/item-details/${nftId}`;
   }
+
+  function goToSlide(slideIndex) {
+    if (!instanceRef.current) {
+      return;
+    }
+
+    instanceRef.current.moveToIdx(slideIndex);
+  }
+
+  function handleSliderKeyDown(event) {
+    if (!instanceRef.current) {
+      return;
+    }
+
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      instanceRef.current.prev();
+    }
+
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      instanceRef.current.next();
+    }
+  }
+
+  const dotCount = items.length;
 
   return (
     <section id="section-items" className="no-bottom">
@@ -89,92 +215,124 @@ const NewItems = () => {
               )}
 
               {!error && items.length > 0 && (
-                <OwlCarousel
-                  className="owl-carousel owl-theme"
-                  loop
-                  margin={20}
-                  nav
-                  dots={false}
-                  responsive={{
-                    0: { items: 1 },
-                    600: { items: 2 },
-                    1000: { items: 4 },
-                  }}
-                >
-                  {items.map((item) => (
-                    <div className="item" key={item.nftId || item.id}>
-                      <div className="nft__item">
-                        <div className="author_list_pp">
-                          <Link
-                            to={`/author/${item.authorId}`}
-                            data-bs-toggle="tooltip"
-                            data-bs-placement="top"
-                            title={`Creator: ${item.authorName || "Unknown"}`}
-                          >
-                            <img className="lazy" src={item.authorImage} alt={item.authorName || "Author"} />
-                            <i className="fa fa-check"></i>
-                          </Link>
-                        </div>
-                        {timeRemaining(item.expiryDate) !== "0h 0m 0s" && (
-                          <div className="de_countdown">{timeRemaining(item.expiryDate)}</div>
-                        )}
-                        <div className="nft__item_wrap">
-                          <div className="nft__item_extra">
-                            <div className="nft__item_buttons">
-                              <button type="button">Buy Now</button>
-                              <div className="nft__item_share">
-                                <h4>Share</h4>
-                                <a
-                                  href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-                                    getItemUrl(item.nftId)
-                                  )}`}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                >
-                                  <i className="fa fa-facebook fa-lg"></i>
-                                </a>
-                                <a
-                                  href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(
-                                    getItemUrl(item.nftId)
-                                  )}&text=${encodeURIComponent(item.title)}`}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                >
-                                  <i className="fa fa-twitter fa-lg"></i>
-                                </a>
-                                <a
-                                  href={`mailto:?subject=${encodeURIComponent(
-                                    `Check out ${item.title}`
-                                  )}&body=${encodeURIComponent(getItemUrl(item.nftId))}`}
-                                >
-                                  <i className="fa fa-envelope fa-lg"></i>
-                                </a>
+                <div className="new-items-keen-wrapper">
+                  <div
+                    ref={sliderRef}
+                    className="keen-slider new-items-keen-slider"
+                    tabIndex={0}
+                    onKeyDown={handleSliderKeyDown}
+                    aria-label="New Items carousel"
+                  >
+                    {items.map((item) => (
+                      <div className="keen-slider__slide" key={item.nftId || item.id}>
+                        <div className="nft__item">
+                          <div className="author_list_pp">
+                            <Link
+                              to={`/author/${item.authorId}`}
+                              data-bs-toggle="tooltip"
+                              data-bs-placement="top"
+                              title={`Creator: ${item.authorName || "Unknown"}`}
+                            >
+                              <img className="lazy" src={item.authorImage} alt={item.authorName || "Author"} />
+                              <i className="fa fa-check"></i>
+                            </Link>
+                          </div>
+                          <CountdownTimer expiryDate={item.expiryDate} />
+                          <div className="nft__item_wrap">
+                            <div className="nft__item_extra">
+                              <div className="nft__item_buttons">
+                                <button type="button">Buy Now</button>
+                                <div className="nft__item_share">
+                                  <h4>Share</h4>
+                                  <a
+                                    href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+                                      getItemUrl(item.nftId)
+                                    )}`}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                  >
+                                    <i className="fa fa-facebook fa-lg"></i>
+                                  </a>
+                                  <a
+                                    href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(
+                                      getItemUrl(item.nftId)
+                                    )}&text=${encodeURIComponent(item.title)}`}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                  >
+                                    <i className="fa fa-twitter fa-lg"></i>
+                                  </a>
+                                  <a
+                                    href={`mailto:?subject=${encodeURIComponent(
+                                      `Check out ${item.title}`
+                                    )}&body=${encodeURIComponent(getItemUrl(item.nftId))}`}
+                                  >
+                                    <i className="fa fa-envelope fa-lg"></i>
+                                  </a>
+                                </div>
                               </div>
                             </div>
-                          </div>
 
-                          <Link to={`/item-details/${item.nftId}`}>
-                            <img
-                              src={item.nftImage}
-                              className="lazy nft__item_preview"
-                              alt={item.title || "NFT"}
-                            />
-                          </Link>
-                        </div>
-                        <div className="nft__item_info">
-                          <Link to={`/item-details/${item.nftId}`}>
-                            <h4>{item.title}</h4>
-                          </Link>
-                          <div className="nft__item_price">{item.price} ETH</div>
-                          <div className="nft__item_like">
-                            <i className="fa fa-heart"></i>
-                            <span>{item.likes}</span>
+                            <Link to={`/item-details/${item.nftId}`}>
+                              <img
+                                src={item.nftImage}
+                                className={`lazy nft__item_preview${
+                                  FEATURED_ZOOM_TITLES.has(item.title) ? " nft__item_preview--zoomed" : ""
+                                }`}
+                                alt={item.title || "NFT"}
+                              />
+                            </Link>
+                          </div>
+                          <div className="nft__item_info">
+                            <Link to={`/item-details/${item.nftId}`}>
+                              <h4>{item.title}</h4>
+                            </Link>
+                            <div className="nft__item_price">{item.price} ETH</div>
+                            <div className="nft__item_like">
+                              <i className="fa fa-heart"></i>
+                              <span>{item.likes}</span>
+                            </div>
                           </div>
                         </div>
                       </div>
+                    ))}
+                  </div>
+
+                  {loaded && instanceRef.current && (
+                    <>
+                      <button
+                        className="new-items-keen-arrow new-items-keen-arrow--left"
+                        onClick={() => instanceRef.current?.prev()}
+                        aria-label="Previous new item"
+                        type="button"
+                      >
+                        &lsaquo;
+                      </button>
+                      <button
+                        className="new-items-keen-arrow new-items-keen-arrow--right"
+                        onClick={() => instanceRef.current?.next()}
+                        aria-label="Next new item"
+                        type="button"
+                      >
+                        &rsaquo;
+                      </button>
+                    </>
+                  )}
+
+                  {loaded && instanceRef.current && dotCount > 1 && (
+                    <div className="new-items-keen-dots" aria-label="Choose a slide">
+                      {Array.from({ length: dotCount }).map((_, index) => (
+                        <button
+                          key={index}
+                          type="button"
+                          className={`new-items-keen-dot${currentSlide === index ? " is-active" : ""}`}
+                          onClick={() => goToSlide(index)}
+                          aria-label={`Go to slide ${index + 1}`}
+                        />
+                      ))}
                     </div>
-                  ))}
-                </OwlCarousel>
+                  )}
+                </div>
               )}
             </>
           )}

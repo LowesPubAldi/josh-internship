@@ -25,9 +25,8 @@ const Landing = () => {
               <div className="spacer-10"></div>
               <h1>Create, sell or collect digital items.</h1>
               <p className="lead">
-                Unit of data stored on a digital ledger, called a blockchain,
-                that certifies a digital asset to be unique and therefore not
-                interchangeable
+                Discover verified digital collectibles, explore trending
+                listings, and buy or sell NFTs on a modern marketplace.
               </p>
               <div className="spacer-10"></div>
               <Link className="btn-main lead" to="/explore">

@@ -26,7 +26,7 @@ describe("App smoke tests", () => {
     render(<App />);
 
     expect(screen.getAllByText(/explore/i).length).toBeGreaterThan(0);
-    expect(screen.getByRole("button", { name: /connect wallet/i })).toBeTruthy();
+    expect(screen.getAllByRole("button", { name: /connect wallet/i }).length).toBeGreaterThan(0);
   });
 
   it("redirects /item-details to explore", () => {
