@@ -1,5 +1,5 @@
 import Home from "./pages/Home";
-import { BrowserRouter as Router, Navigate, Route, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Explore from "./pages/Explore";
 import Author from "./pages/Author";
 import ItemDetails from "./pages/ItemDetails";
@@ -10,9 +10,10 @@ import AOS from "aos";
 import "aos/dist/aos.css";
 
 function App() {
+
   useEffect(() => {
     AOS.init();
-  }, []);
+}, []);
 
   return (
     <Router>
@@ -22,7 +23,7 @@ function App() {
         <Route path="/explore" element={<Explore />} />
         <Route path="/author/:id" element={<Author />} />
         <Route path="/item-details/:nftId" element={<ItemDetails />} />
-        <Route path="/item-details" element={<Navigate to="/explore" replace />} />
+        <Route path="/item-details" element={<ItemDetails />} />
       </Routes>
       <Footer />
     </Router>
