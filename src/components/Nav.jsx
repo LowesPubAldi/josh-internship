@@ -10,14 +10,6 @@ const Nav = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  function getExploreQueryFromLocation() {
-    if (location.pathname !== "/explore") {
-      return "";
-    }
-
-    return (new URLSearchParams(location.search).get("q") || "").trim();
-  }
-
   const openNav = () => {
     document.body.classList.add("menu__open");
   };
@@ -49,7 +41,10 @@ const Nav = () => {
   }, [hasTypedSearch, searchTerm, navigate, location.pathname, location.search]);
 
   useEffect(() => {
-    const queryFromUrl = getExploreQueryFromLocation();
+    const queryFromUrl =
+      location.pathname === "/explore"
+        ? (new URLSearchParams(location.search).get("q") || "").trim()
+        : "";
     setSearchTerm(queryFromUrl);
   }, [location.pathname, location.search]);
 
@@ -109,6 +104,28 @@ const Nav = () => {
               </div>
 
               <div className="de-flex-col header-col-mid nav-header-right">
+                <ul id="mainmenu">
+                  <li className="menu-item-has-children has-child">
+                    <Link to="/">
+                      Home<span></span>
+                    </Link>
+                  </li>
+                  <li className="menu-item-has-children has-child">
+                    <Link to="/explore">
+                      Explore<span></span>
+                    </Link>
+                  </li>
+                  <li>
+                    <button
+                      type="button"
+                      className="btn-main connect-wallet"
+                      onClick={openWalletModal}
+                    >
+                      Connect Wallet (Demo)
+                    </button>
+                  </li>
+                </ul>
+
                 <div className="menu_side_area">
                   <span onClick={() => openNav()} id="menu-btn"></span>
                 </div>

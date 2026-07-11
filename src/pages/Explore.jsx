@@ -43,15 +43,8 @@ useEffect(() => {
               className="d-item col-lg-3 col-md-6 col-sm-6 col-xs-12"
               style={{ marginBottom: "30px" }}
             >
-            <div
-            style={{
-              width: "100%",
-              height: "350px",
-              backgroundColor: "red",
-              border: "5px solid black"
-            }}
-            >TEST
-            </div></div>
+              <Skeleton width="100%" height="350px" borderRadius="12px" />
+            </div>
             ))
             ) : (
             <ExploreItems />

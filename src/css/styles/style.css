@@ -13777,6 +13777,21 @@ a.read_more i {
   float: right;
 }
 
+.nft__item_like_button {
+  border: none;
+  background: transparent;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.nft__item_like_button:focus-visible {
+  outline: 2px solid #ec7498;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 .rtl .nft__item_like {
   float: left;
 }

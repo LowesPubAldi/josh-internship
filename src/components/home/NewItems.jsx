@@ -8,52 +8,6 @@ import ErrorNotice from "../UI/ErrorNotice";
 
 const FEATURED_ZOOM_TITLES = new Set(["Deep Sea Phantasy", "Two Tigers"]);
 
-const AUTOPLAY_INTERVAL_MS = 3800;
-
-function autoplayPlugin(slider) {
-  let timeout;
-  let mouseOver = false;
-  let destroyed = false;
-
-  function clearNextTimeout() {
-    clearTimeout(timeout);
-  }
-
-  function nextTimeout() {
-    clearTimeout(timeout);
-
-    if (mouseOver || destroyed) {
-      return;
-    }
-
-    timeout = setTimeout(() => {
-      slider.next();
-    }, AUTOPLAY_INTERVAL_MS);
-  }
-
-  slider.on("created", () => {
-    slider.container.addEventListener("mouseover", () => {
-      mouseOver = true;
-      clearNextTimeout();
-    });
-
-    slider.container.addEventListener("mouseout", () => {
-      mouseOver = false;
-      nextTimeout();
-    });
-
-    nextTimeout();
-  });
-
-  slider.on("dragStarted", clearNextTimeout);
-  slider.on("animationEnded", nextTimeout);
-  slider.on("updated", nextTimeout);
-  slider.on("destroyed", () => {
-    destroyed = true;
-    clearNextTimeout();
-  });
-}
-
 function getTimeRemaining(expiryDate) {
   const total = Number(expiryDate) - Date.now();
 
@@ -93,18 +47,16 @@ const CountdownTimer = ({ expiryDate }) => {
 
 const NewItems = () => {
   const [items, setItems] = useState([]);
+  const [likedById, setLikedById] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [currentSlide, setCurrentSlide] = useState(0);
   const [loaded, setLoaded] = useState(false);
   const [sliderRef, instanceRef] = useKeenSlider({
     loop: true,
     mode: "snap",
+    drag: false,
     defaultAnimation: {
       duration: 850,
-    },
-    slideChanged(slider) {
-      setCurrentSlide(slider.track.details.rel);
     },
     created() {
       setLoaded(true);
@@ -127,7 +79,7 @@ const NewItems = () => {
       perView: 4,
       spacing: 20,
     },
-  }, [autoplayPlugin]);
+  });
 
   async function getNewItems() {
     setLoading(true);
@@ -138,6 +90,7 @@ const NewItems = () => {
         "https://us-central1-nft-cloud-functions.cloudfunctions.net/newItems"
       );
       setItems(Array.isArray(data) ? data : []);
+      setLikedById({});
     } catch (fetchError) {
       setItems([]);
       setError("We could not load new items right now.");
@@ -160,31 +113,21 @@ const NewItems = () => {
     return `${window.location.origin}/item-details/${nftId}`;
   }
 
-  function goToSlide(slideIndex) {
-    if (!instanceRef.current) {
-      return;
-    }
-
-    instanceRef.current.moveToIdx(slideIndex);
+  function getItemKey(item) {
+    return String(item.nftId || item.id);
   }
 
-  function handleSliderKeyDown(event) {
-    if (!instanceRef.current) {
-      return;
-    }
-
-    if (event.key === "ArrowLeft") {
-      event.preventDefault();
-      instanceRef.current.prev();
-    }
-
-    if (event.key === "ArrowRight") {
-      event.preventDefault();
-      instanceRef.current.next();
-    }
+  function getBaseLikes(item) {
+    const parsedLikes = Number(item.likes);
+    return Number.isFinite(parsedLikes) ? parsedLikes : 0;
   }
 
-  const dotCount = items.length;
+  function handleLikeToggle(itemKey) {
+    setLikedById((prevLikedById) => ({
+      ...prevLikedById,
+      [itemKey]: !prevLikedById[itemKey],
+    }));
+  }
 
   return (
     <section id="section-items" className="no-bottom">
@@ -219,12 +162,15 @@ const NewItems = () => {
                   <div
                     ref={sliderRef}
                     className="keen-slider new-items-keen-slider"
-                    tabIndex={0}
-                    onKeyDown={handleSliderKeyDown}
                     aria-label="New Items carousel"
                   >
-                    {items.map((item) => (
-                      <div className="keen-slider__slide" key={item.nftId || item.id}>
+                    {items.map((item) => {
+                      const itemKey = getItemKey(item);
+                      const isLiked = Boolean(likedById[itemKey]);
+                      const displayedLikes = getBaseLikes(item) + (isLiked ? 1 : 0);
+
+                      return (
+                      <div className="keen-slider__slide" key={itemKey}>
                         <div className="nft__item">
                           <div className="author_list_pp">
                             <Link
@@ -289,13 +235,22 @@ const NewItems = () => {
                             </Link>
                             <div className="nft__item_price">{item.price} ETH</div>
                             <div className="nft__item_like">
-                              <i className="fa fa-heart"></i>
-                              <span>{item.likes}</span>
+                              <button
+                                type="button"
+                                className="nft__item_like_button"
+                                onClick={() => handleLikeToggle(itemKey)}
+                                aria-pressed={isLiked}
+                                aria-label={`${isLiked ? "Unlike" : "Like"} ${item.title}`}
+                              >
+                                <i className={`fa fa-heart${isLiked ? " active" : ""}`}></i>
+                                <span>{displayedLikes}</span>
+                              </button>
                             </div>
                           </div>
                         </div>
                       </div>
-                    ))}
+                    );
+                    })}
                   </div>
 
                   {loaded && instanceRef.current && (
@@ -319,19 +274,6 @@ const NewItems = () => {
                     </>
                   )}
 
-                  {loaded && instanceRef.current && dotCount > 1 && (
-                    <div className="new-items-keen-dots" aria-label="Choose a slide">
-                      {Array.from({ length: dotCount }).map((_, index) => (
-                        <button
-                          key={index}
-                          type="button"
-                          className={`new-items-keen-dot${currentSlide === index ? " is-active" : ""}`}
-                          onClick={() => goToSlide(index)}
-                          aria-label={`Go to slide ${index + 1}`}
-                        />
-                      ))}
-                    </div>
-                  )}
                 </div>
               )}
             </>

@@ -10,23 +10,33 @@ const Author = () => {
   const [following, setFollowing] = useState(false);
   const { id } = useParams();
 
-  async function fetchAuthor() {
-    setLoading(true);
-
-    const response = await fetch(
-      `https://us-central1-nft-cloud-functions.cloudfunctions.net/authors?author=${id}`
-    );
-
-    const data = await response.json();
-
-    setTimeout(() => {
-      setAuthor(data);
-      setLoading(false);
-    }, 1000);
-  }
-
   useEffect(() => {
-    fetchAuthor();
+    let isMounted = true;
+
+    async function loadAuthor() {
+      setLoading(true);
+
+      const response = await fetch(
+        `https://us-central1-nft-cloud-functions.cloudfunctions.net/authors?author=${id}`
+      );
+
+      const data = await response.json();
+
+      setTimeout(() => {
+        if (!isMounted) {
+          return;
+        }
+
+        setAuthor(data);
+        setLoading(false);
+      }, 1000);
+    }
+
+    loadAuthor();
+
+    return () => {
+      isMounted = false;
+    };
   }, [id]);
 
   return (
