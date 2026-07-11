@@ -5,10 +5,12 @@ import ErrorNotice from "../UI/ErrorNotice";
 
 const ExploreItems = () => {
   const [items, setItems] = useState([]);
+  const [likedById, setLikedById] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [visibleItems, setVisibleItems] = useState(8);
   const [filter, setFilter] = useState("");
+  const [fieldFilter, setFieldFilter] = useState("");
   const [currentTime, setCurrentTime] = useState(Date.now());
   const [searchParams] = useSearchParams();
   const rawSearchQuery = (searchParams.get("q") || "").trim();
@@ -39,6 +41,7 @@ const ExploreItems = () => {
 
       const data = await response.json();
       setItems(Array.isArray(data) ? data : []);
+      setLikedById({});
       setVisibleItems(8);
     } catch (fetchError) {
       setItems([]);
@@ -62,7 +65,7 @@ const ExploreItems = () => {
 
   useEffect(() => {
     setVisibleItems(8);
-  }, [normalizedSearchQuery]);
+  }, [normalizedSearchQuery, fieldFilter]);
 
   function formatTimeLeft(expiryDate) {
     const timeLeft = expiryDate - currentTime;
@@ -82,7 +85,23 @@ const ExploreItems = () => {
     return `${window.location.origin}/item-details/${nftId}`;
   }
 
-  const filteredItems = normalizedSearchQuery
+  function getItemKey(item) {
+    return String(item.nftId || item.id);
+  }
+
+  function getBaseLikes(item) {
+    const parsedLikes = Number(item.likes);
+    return Number.isFinite(parsedLikes) ? parsedLikes : 0;
+  }
+
+  function handleLikeToggle(itemKey) {
+    setLikedById((prevLikedById) => ({
+      ...prevLikedById,
+      [itemKey]: !prevLikedById[itemKey],
+    }));
+  }
+
+  const searchFilteredItems = normalizedSearchQuery
     ? items.filter((item) => {
         const searchableText = normalizeSearchText(
           [
@@ -104,22 +123,66 @@ const ExploreItems = () => {
       })
     : items;
 
+  const filteredItems = searchFilteredItems.filter((item) => {
+    const itemPrice = parseFloat(String(item.price));
+    const itemLikes = Number(item.likes);
+    const hasAuctionTime = Number(item.expiryDate) > currentTime;
+
+    switch (fieldFilter) {
+      case "price_under_1":
+        return Number.isFinite(itemPrice) && itemPrice < 1;
+      case "price_1_to_3":
+        return Number.isFinite(itemPrice) && itemPrice >= 1 && itemPrice <= 3;
+      case "price_over_3":
+        return Number.isFinite(itemPrice) && itemPrice > 3;
+      case "likes_50_plus":
+        return Number.isFinite(itemLikes) && itemLikes >= 50;
+      case "auction_active":
+        return hasAuctionTime;
+      default:
+        return true;
+    }
+  });
+
   const visibleFilteredItems = filteredItems.slice(0, visibleItems);
+  const searchResultCount = filteredItems.length;
 
   return (
     <>
-      <div>
-        <select
-          id="filter-items"
-          value={filter}
-          onChange={(event) => setFilter(event.target.value)}>
-          <option value="">Default</option>
-          <option value="price_low_to_high">Price, Low to High</option>
-          <option value="price_high_to_low">Price, High to Low</option>
-          <option value="likes_high_to_low">Most liked</option>
-        </select>
+      <div className="explore-filter-controls">
+        <div className="explore-filter-control">
+          <select
+            id="filter-items"
+            value={filter}
+            onChange={(event) => setFilter(event.target.value)}>
+            <option value="">Default</option>
+            <option value="price_low_to_high">Price, Low to High</option>
+            <option value="price_high_to_low">Price, High to Low</option>
+            <option value="likes_high_to_low">Most liked</option>
+          </select>
+        </div>
 
-        {rawSearchQuery && <p>Showing results for "{rawSearchQuery}"</p>}
+        <div className="explore-filter-control explore-filter-control--right">
+          <select
+            id="field-filter-items"
+            value={fieldFilter}
+            onChange={(event) => setFieldFilter(event.target.value)}
+          >
+            <option value="">All Items</option>
+            <option value="auction_active">Active Auctions</option>
+            <option value="price_under_1">Under 1 ETH</option>
+            <option value="price_1_to_3">1 to 3 ETH</option>
+            <option value="price_over_3">Over 3 ETH</option>
+            <option value="likes_50_plus">50+ Likes</option>
+          </select>
+        </div>
+
+        {rawSearchQuery && (
+          <p>
+            Showing {searchResultCount} result{searchResultCount === 1 ? "" : "s"} for "
+            {rawSearchQuery}"
+          </p>
+        )}
       </div>
 
       <div className="row">
@@ -130,9 +193,14 @@ const ExploreItems = () => {
             </div>
           ))
         ) : (
-          visibleFilteredItems.map((item) => (
+          visibleFilteredItems.map((item) => {
+          const itemKey = getItemKey(item);
+          const isLiked = Boolean(likedById[itemKey]);
+          const displayedLikes = getBaseLikes(item) + (isLiked ? 1 : 0);
+
+          return (
           <div
-            key={item.nftId}
+            key={itemKey}
             className="d-item col-lg-3 col-md-6 col-sm-6 col-xs-12"
             style={{ display: "block", backgroundSize: "cover" }}
           >
@@ -201,13 +269,22 @@ const ExploreItems = () => {
                 </Link>
                 <div className="nft__item_price">{item.price} ETH</div>
                 <div className="nft__item_like">
-                  <i className="fa fa-heart"></i>
-                  <span>{item.likes}</span>
+                  <button
+                    type="button"
+                    className="nft__item_like_button"
+                    onClick={() => handleLikeToggle(itemKey)}
+                    aria-pressed={isLiked}
+                    aria-label={`${isLiked ? "Unlike" : "Like"} ${item.title}`}
+                  >
+                    <i className={`fa fa-heart${isLiked ? " active" : ""}`}></i>
+                    <span>{displayedLikes}</span>
+                  </button>
                 </div>
               </div>
             </div>
           </div>
-          ))
+          );
+          })
         )}
       </div>
 

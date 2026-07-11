@@ -2,11 +2,81 @@ import React, { useEffect, useState } from "react";
 import EthImage from "../images/ethereum.svg";
 import { Link, useParams } from "react-router-dom";
 import Skeleton from "../components/UI/Skeleton";
+import { ensureEnglishDescription } from "../utils/descriptionLanguage";
 
 const ItemDetails = () => {
   const [item, setItem] = useState({});
   const [loading, setLoading] = useState(true);
+  const [actionMessage, setActionMessage] = useState("");
+  const [watching, setWatching] = useState(false);
+  const [liked, setLiked] = useState(false);
+  const [watchCount, setWatchCount] = useState(0);
+  const [likeCount, setLikeCount] = useState(0);
+  const [showBidForm, setShowBidForm] = useState(false);
+  const [bidAmount, setBidAmount] = useState("");
+  const [showBuyConfirm, setShowBuyConfirm] = useState(false);
+  const [hasPurchased, setHasPurchased] = useState(false);
   const { nftId } = useParams();
+
+  const descriptionText = ensureEnglishDescription(item.description, item);
+
+  const handlePlaceBid = () => {
+    setShowBidForm(true);
+    setShowBuyConfirm(false);
+    setActionMessage("");
+  };
+
+  const handleBuyNow = () => {
+    if (hasPurchased) {
+      return;
+    }
+
+    setShowBuyConfirm(true);
+    setShowBidForm(false);
+    setActionMessage("");
+  };
+
+  const handleWatchToggle = () => {
+    const nextWatching = !watching;
+    setWatching(nextWatching);
+    setWatchCount((prevCount) => Math.max(0, prevCount + (nextWatching ? 1 : -1)));
+  };
+
+  const handleLikeToggle = () => {
+    const nextLiked = !liked;
+    setLiked(nextLiked);
+    setLikeCount((prevCount) => Math.max(0, prevCount + (nextLiked ? 1 : -1)));
+  };
+
+  const handleBidSubmit = (event) => {
+    event.preventDefault();
+    const numericBid = Number.parseFloat(bidAmount);
+    const currentPrice = Number.parseFloat(item.price);
+
+    if (!numericBid || numericBid <= 0) {
+      setActionMessage("Enter a valid bid amount in ETH.");
+      return;
+    }
+
+    if (!Number.isFinite(currentPrice) || numericBid <= currentPrice) {
+      setActionMessage(`Bid must be greater than ${currentPrice.toFixed(2)} ETH.`);
+      return;
+    }
+
+    setActionMessage(`Bid of ${numericBid.toFixed(2)} ETH placed for ${item.title}.`);
+    setBidAmount("");
+    setShowBidForm(false);
+  };
+
+  const handleBuyConfirm = () => {
+    if (hasPurchased) {
+      return;
+    }
+
+    setActionMessage(`Purchase complete for ${item.title} at ${item.price} ETH.`);
+    setHasPurchased(true);
+    setShowBuyConfirm(false);
+  };
 
 useEffect(() => {
   async function fetchItemDetails() {
@@ -18,6 +88,15 @@ useEffect(() => {
 
     setTimeout(() => {
       setItem(data);
+      setWatchCount(data.views || 0);
+      setLikeCount(data.likes || 0);
+      setWatching(false);
+      setLiked(false);
+      setShowBidForm(false);
+      setShowBuyConfirm(false);
+      setBidAmount("");
+      setHasPurchased(false);
+      setActionMessage("");
       setLoading(false);
     }, 1000);
   }
@@ -60,17 +139,91 @@ useEffect(() => {
                     </h2>
 
                     <div className="item_info_counts">
-                      <div className="item_info_views">
+                      <button
+                        type="button"
+                        className={`item_info_metric_button ${watching ? "active" : ""}`}
+                        onClick={handleWatchToggle}
+                        aria-label="Toggle watching"
+                      >
                         <i className="fa fa-eye"></i>
-                        {item.views}
-                      </div>
-                      <div className="item_info_like">
+                        {watchCount}
+                      </button>
+                      <button
+                        type="button"
+                        className={`item_info_metric_button ${liked ? "active" : ""}`}
+                        onClick={handleLikeToggle}
+                        aria-label="Toggle like"
+                      >
                         <i className="fa fa-heart"></i>
-                        {item.likes}
-                      </div>
+                        {likeCount}
+                      </button>
                     </div>
 
-                    <p>{item.description}</p>
+                    <div className="item-detail-actions">
+                      <button
+                        type="button"
+                        className="btn-main btn-small"
+                        onClick={handlePlaceBid}
+                      >
+                        Place Bid
+                      </button>
+                      <button
+                        type="button"
+                        className="btn-main btn-small"
+                        onClick={handleBuyNow}
+                        disabled={hasPurchased}
+                      >
+                        {hasPurchased ? "Purchased" : "Buy Now"}
+                      </button>
+                    </div>
+
+                    {showBidForm && (
+                      <form className="item-detail-inline-panel" onSubmit={handleBidSubmit}>
+                        <label htmlFor="bid-amount">Your Bid (ETH)</label>
+                        <div className="item-detail-inline-row">
+                          <input
+                            id="bid-amount"
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            value={bidAmount}
+                            onChange={(event) => setBidAmount(event.target.value)}
+                            placeholder="e.g. 5.50"
+                          />
+                          <button type="submit" className="btn-main btn-small">
+                            Submit Bid
+                          </button>
+                        </div>
+                      </form>
+                    )}
+
+                    {showBuyConfirm && !hasPurchased && (
+                      <div className="item-detail-inline-panel">
+                        <p>
+                          Confirm purchase of {item.title} for {item.price} ETH?
+                        </p>
+                        <div className="item-detail-inline-row">
+                          <button
+                            type="button"
+                            className="btn-main btn-small"
+                            onClick={handleBuyConfirm}
+                          >
+                            Confirm Purchase
+                          </button>
+                          <button
+                            type="button"
+                            className="btn-main btn-small btn-secondary"
+                            onClick={() => setShowBuyConfirm(false)}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {actionMessage && <p className="item-detail-action-note">{actionMessage}</p>}
+
+                    <p>{descriptionText}</p>
 
                     <div className="d-flex flex-row">
                       <div className="mr40">

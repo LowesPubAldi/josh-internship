@@ -5,6 +5,23 @@ import Skeleton from "../UI/Skeleton";
 const AuthorItems = ({ authorId } ) => {
   const [author, setAuthor] = useState({});
   const [loading, setLoading] = useState(true);
+  const [likedById, setLikedById] = useState({});
+
+  function getItemKey(item) {
+    return String(item.nftId || item.id);
+  }
+
+  function getBaseLikes(item) {
+    const parsedLikes = Number(item.likes);
+    return Number.isFinite(parsedLikes) ? parsedLikes : 0;
+  }
+
+  function handleLikeToggle(itemKey) {
+    setLikedById((prevLikedById) => ({
+      ...prevLikedById,
+      [itemKey]: !prevLikedById[itemKey],
+    }));
+  }
 
   useEffect(() => {
     let isMounted = true;
@@ -24,6 +41,7 @@ const AuthorItems = ({ authorId } ) => {
         }
 
         setAuthor(data);
+        setLikedById({});
         setLoading(false);
       }, 1000);
     }
@@ -49,7 +67,12 @@ const AuthorItems = ({ authorId } ) => {
     </div>
   ))
 ) : (
-            author.nftCollection?.map((item, index) => (
+            author.nftCollection?.map((item, index) => {
+              const itemKey = getItemKey(item);
+              const isLiked = Boolean(likedById[itemKey]);
+              const displayedLikes = getBaseLikes(item) + (isLiked ? 1 : 0);
+
+              return (
               <div
                 className="col-lg-3 col-md-6 col-sm-6 col-xs-12"
                 key={index}
@@ -118,13 +141,22 @@ const AuthorItems = ({ authorId } ) => {
                     </Link>
                     <div className="nft__item_price">{item.price} ETH</div>
                     <div className="nft__item_like">
-                      <i className="fa fa-heart"></i>
-                      <span>{item.likes}</span>
+                      <button
+                        type="button"
+                        className="nft__item_like_button"
+                        onClick={() => handleLikeToggle(itemKey)}
+                        aria-pressed={isLiked}
+                        aria-label={`${isLiked ? "Unlike" : "Like"} ${item.title}`}
+                      >
+                        <i className={`fa fa-heart${isLiked ? " active" : ""}`}></i>
+                        <span>{displayedLikes}</span>
+                      </button>
                     </div>
                   </div>
                 </div>
               </div>
-            ))
+            );
+            })
           )}
         </div>
       </div>

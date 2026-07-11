@@ -1,0 +1,10 @@
+{
+  "css.lint.compatibleVendorPrefixes": "ignore",
+  "css.lint.vendorPrefix": "ignore",
+  "css.lint.duplicateProperties": "warning",
+  "css.lint.unknownVendorSpecificProperties": "ignore",
+  "scss.lint.compatibleVendorPrefixes": "ignore",
+  "scss.lint.vendorPrefix": "ignore",
+  "less.lint.compatibleVendorPrefixes": "ignore",
+  "less.lint.vendorPrefix": "ignore"
+}

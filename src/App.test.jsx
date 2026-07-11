@@ -11,12 +11,6 @@ jest.mock("aos", () => ({
   init: jest.fn(),
 }));
 
-jest.mock("react-owl-carousel", () => {
-  return function MockCarousel({ children }) {
-    return <div data-testid="mock-carousel">{children}</div>;
-  };
-});
-
 describe("App smoke tests", () => {
   beforeEach(() => {
     window.scrollTo = jest.fn();

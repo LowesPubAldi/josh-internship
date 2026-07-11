@@ -105,12 +105,12 @@ const Nav = () => {
 
               <div className="de-flex-col header-col-mid nav-header-right">
                 <ul id="mainmenu">
-                  <li className="menu-item-has-children has-child">
+                  <li>
                     <Link to="/">
                       Home<span></span>
                     </Link>
                   </li>
-                  <li className="menu-item-has-children has-child">
+                  <li>
                     <Link to="/explore">
                       Explore<span></span>
                     </Link>

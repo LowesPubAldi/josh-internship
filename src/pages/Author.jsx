@@ -10,6 +10,19 @@ const Author = () => {
   const [following, setFollowing] = useState(false);
   const { id } = useParams();
 
+  const authorNameLength = (author.authorName || "").trim().length;
+  const maxTagLength = Math.max(6, authorNameLength);
+  const normalizedTag = (author.tag || "").trim();
+  const displayTag =
+    normalizedTag.length > maxTagLength
+      ? `${normalizedTag.slice(0, maxTagLength)}...`
+      : normalizedTag;
+  const normalizedAddress = (author.address || "").trim();
+  const displayAddress =
+    normalizedAddress.length > 17
+      ? `${normalizedAddress.slice(0, 8)}...${normalizedAddress.slice(-6)}`
+      : normalizedAddress;
+
   useEffect(() => {
     let isMounted = true;
 
@@ -51,7 +64,7 @@ const Author = () => {
           style={{ background: `url(${AuthorBanner}) top` }}
         ></section>
 
-        <section aria-label="section">
+        <section aria-label="section" className="author-profile-section">
           <div className="container">
             {loading ? (
               <div className="row">
@@ -66,17 +79,19 @@ const Author = () => {
                         <img src={author.authorImage} alt="" />
                         <i className="fa fa-check"></i>
                         <div className="profile_name">
-                          <h4>
+                          <h4 className="author-profile-heading">
                             {author.authorName}
-                            <span className="profile_username">
-                              @{author.tag}
+                            <span className="profile_username" title={`@${normalizedTag}`}>
+                              @{displayTag}
                             </span>
-                            <span id="wallet" className="profile_wallet">
-                              {author.address}
-                            </span>
-                            <button id="btn_copy" title="Copy Text">
-                              Copy
-                            </button>
+                            <div className="profile_wallet_row">
+                              <span id="wallet" className="profile_wallet" title={normalizedAddress}>
+                                {displayAddress}
+                              </span>
+                              <button type="button" id="btn_copy" title="Copy Text">
+                                Copy
+                              </button>
+                            </div>
                           </h4>
                         </div>
                       </div>

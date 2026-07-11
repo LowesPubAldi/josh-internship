@@ -1,14 +1,42 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import OwlCarousel from "react-owl-carousel";
-import "../../css/styles/owl.carousel.css";
-import "../../css/styles/owl.theme.css";
+import { useKeenSlider } from "keen-slider/react";
+import "keen-slider/keen-slider.min.css";
 import Skeleton from "../UI/Skeleton";
 
 const HotCollections = () => {
   const [collections, setCollections] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loaded, setLoaded] = useState(false);
+  const [sliderRef, instanceRef] = useKeenSlider({
+    loop: true,
+    mode: "snap",
+    defaultAnimation: {
+      duration: 850,
+    },
+    created() {
+      setLoaded(true);
+    },
+    breakpoints: {
+      "(max-width: 999px)": {
+        slides: {
+          perView: 2,
+          spacing: 20,
+        },
+      },
+      "(max-width: 599px)": {
+        slides: {
+          perView: 1,
+          spacing: 20,
+        },
+      },
+    },
+    slides: {
+      perView: 4,
+      spacing: 20,
+    },
+  });
 
 async function getHotCollections() {
   try {
@@ -33,6 +61,12 @@ useEffect(() => {
   getHotCollections();
 }, []);
 
+useEffect(() => {
+  if (instanceRef.current) {
+    instanceRef.current.update();
+  }
+}, [collections, instanceRef]);
+
   return (
     <section id="section-collections" className="no-bottom">
       <div className="container">
@@ -55,20 +89,14 @@ useEffect(() => {
           ))}
           </div>
           ) : (
-          <OwlCarousel
-          className="owl-carousel owl-theme"
-          loop
-          margin={20}
-          nav
-          dots={false}
-          responsive={{
-            0: { items: 1},
-            600: { items: 2},
-            1000: { items: 4},
-          }}
-          >
-          {collections.map((collection) => (
-            <div className="item" key={collection.nftId}>
+          <div className="new-items-keen-wrapper">
+            <div
+              ref={sliderRef}
+              className="keen-slider new-items-keen-slider"
+              aria-label="Hot Collections carousel"
+            >
+            {collections.map((collection) => (
+            <div className="keen-slider__slide" key={collection.nftId}>
               <div className="nft_coll">
                 <div className="nft_wrap">
                   <Link to={`/item-details/${collection.nftId}`}>
@@ -94,7 +122,28 @@ useEffect(() => {
               </div>
             </div>
           ))}
-          </OwlCarousel>
+            </div>
+            {loaded && instanceRef.current && (
+              <>
+                <button
+                  className="new-items-keen-arrow new-items-keen-arrow--left"
+                  onClick={() => instanceRef.current?.prev()}
+                  aria-label="Previous collection"
+                  type="button"
+                >
+                  &lsaquo;
+                </button>
+                <button
+                  className="new-items-keen-arrow new-items-keen-arrow--right"
+                  onClick={() => instanceRef.current?.next()}
+                  aria-label="Next collection"
+                  type="button"
+                >
+                  &rsaquo;
+                </button>
+              </>
+            )}
+          </div>
           )}
         </div>
       </div>
