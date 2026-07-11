@@ -2,7 +2,7 @@ import React from "react";
 
 const LandingIntro = () => {
   return (
-    <section id="section-intro" className="no-top no-bottom">
+    <section id="section-intro" className="no-top no-bottom home-intro-section">
       <div className="container">
         <div className="row">
           <div className="col-lg-4 col-md-12 mb-sm-30">
